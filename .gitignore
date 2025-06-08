@@ -5,3 +5,8 @@ venv/
 # Arquivos de configuração pessoal
 .env
 *.env
+
+.idea/
+idea/
+
+__pycache__/
