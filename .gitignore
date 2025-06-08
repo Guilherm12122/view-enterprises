@@ -2,10 +2,6 @@
 .venv/
 venv/
 
-# Arquivos de configuração pessoal
-.env
-*.env
-
 .idea/
 idea/
 

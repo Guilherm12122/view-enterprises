@@ -32,6 +32,9 @@ class Extracao(EtapaEtl):
         df_api_receita: DataFrame = self.obter_dataframe_dados_api(dados_api_receita, schema_dados_receita)
         df_brasil_api: DataFrame = self.obter_dataframe_dados_api(dados_brasil_api, schema_dados_brasil_api)
 
+        df_brasil_api.show()
+        df_api_receita.show()
+
         return df_api_receita, df_brasil_api
 
 
