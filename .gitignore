@@ -7,5 +7,6 @@ venv/
 *.env
 
 .idea/
+idea/
 
 __pycache__/
