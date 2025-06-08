@@ -1,3 +1,7 @@
+from pyspark.sql import DataFrame, Row
+
+from etl.const.schemas.schema_dados_brasil_api import schema_dados_brasil_api
+from etl.const.schemas.schema_dados_receita import schema_dados_receita
 from etl.i_etapa_etl import EtapaEtl
 from service.cnpj_service import CnpjService
 from service.dynamo_service import DynamoService
@@ -5,7 +9,8 @@ from service.dynamo_service import DynamoService
 
 class Extracao(EtapaEtl):
 
-    def __init__(self):
+    def __init__(self, spark_op):
+        self.spark_op = spark_op
         self.api_service = CnpjService()
         self.dynamo_service = DynamoService()
 
@@ -23,12 +28,13 @@ class Extracao(EtapaEtl):
 
         dados_api_receita = [self.api_service.obter_dados_cnpj(url_api_receita, cpnj)
                             for cpnj in lista_cnpj]
-        
-        #for cnpj in lista_cnpj:
-        #    print(cnpj)
 
-        #dados_brasil_api = self.api_service.obter_dados_cnpj(url_brasil_api, lista_cnpj[0])
-        #dados_api_receita = self.api_service.obter_dados_cnpj(url_api_receita, lista_cnpj[1])
+        df_api_receita: DataFrame = self.obter_dataframe_dados_api(dados_api_receita, schema_dados_receita)
+        df_brasil_api: DataFrame = self.obter_dataframe_dados_api(dados_brasil_api, schema_dados_brasil_api)
 
-        print(len(dados_api_receita))
-        print(len(dados_brasil_api))
+        return df_api_receita, df_brasil_api
+
+
+    def obter_dataframe_dados_api(self, dados, schema):
+
+        return self.spark_op.createDataFrame(dados, schema)
