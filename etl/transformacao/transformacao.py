@@ -1,5 +1,5 @@
 from pyspark.sql.dataframe import DataFrame
-from pyspark.sql.functions import col, explode, concat, lit, row_number
+from pyspark.sql.functions import col, explode, concat, lit, row_number, regexp_replace, coalesce
 from pyspark.sql import Window
 
 from devutils.UtilFunctions import UtilFunctions
@@ -13,12 +13,53 @@ class Transformacao(EtapaEtl):
 
     def executar(self, df_receita_api: DataFrame, df_brasil_api: DataFrame) -> DataFrame:
 
-        df_dados_receita_tratados = self.tratar_dados_receita(df_receita_api)
+        df_dados_receita_tratados = self.selecionar_colunas_receita(self.tratar_dados_receita(df_receita_api))
 
-        #UtilFunctions.write_df_into_directory(df_dados_receita_tratados)
+        df_dados_receita_tratados = self.preparar_cnpj_receita_join(df_dados_receita_tratados)
+
+        df_dados_receita_brasil_api = self.join_dados_receita_brasil_api(df_dados_receita_tratados, df_brasil_api)
+
+        return df_dados_receita_brasil_api
 
 
-    def tratar_dados_receita(self, df_receita_api):
+    def join_dados_receita_brasil_api(self, df_receita: DataFrame, df_brasil_api: DataFrame) -> DataFrame:
+
+        df_join = df_receita.join(df_brasil_api, df_receita['cnpj'] == df_brasil_api['cnpj'], 'left') \
+                                 .select(
+                                        df_receita['cnpj'],
+                                        df_brasil_api['pais'],
+                                        df_receita['atividade_principal'],
+                                        df_receita['atividades_secundarias'],
+                                        coalesce(df_receita['telefone'],
+                                                 df_brasil_api['ddd_telefone_1'],
+                                                 df_brasil_api['ddd_telefone_2']).alias('telefone'),
+                                        coalesce(df_receita['nome'],
+                                                 df_brasil_api['razao_social']).alias('nome'),
+                                        df_brasil_api['data_inicio_atividade'],
+                                        df_brasil_api['cnae_fiscal_descricao'],
+                                        df_brasil_api['capital_social'])
+
+        return df_join
+
+
+    def preparar_cnpj_receita_join(self, df_receita: DataFrame) -> DataFrame:
+
+        return df_receita.withColumn('cnpj', regexp_replace(col('cnpj'), "[\./-]", ""))
+
+
+    def selecionar_colunas_receita(self, df_receita: DataFrame) -> DataFrame:
+
+        return df_receita \
+                .select(
+                    col('cnpj'),
+                    col('nome'),
+                    col('atividade_principal'),
+                    col('atividades_secundarias'),
+                    col('telefone')
+                )
+
+
+    def tratar_dados_receita(self, df_receita_api: DataFrame):
 
         df_atividade_pr, df_atividade_sec = self.obter_dados_atividade_primaria_secundaria(df_receita_api)
 
