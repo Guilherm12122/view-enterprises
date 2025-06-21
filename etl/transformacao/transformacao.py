@@ -1,6 +1,8 @@
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import col, explode, concat, lit, row_number
 from pyspark.sql import Window
+
+from devutils.UtilFunctions import UtilFunctions
 from etl.i_etapa_etl import EtapaEtl
 
 
@@ -11,7 +13,10 @@ class Transformacao(EtapaEtl):
 
     def executar(self, df_receita_api: DataFrame, df_brasil_api: DataFrame) -> DataFrame:
 
-        self.tratar_dados_receita(df_receita_api)
+        df_dados_receita_tratados = self.tratar_dados_receita(df_receita_api)
+
+        #UtilFunctions.write_df_into_directory(df_dados_receita_tratados)
+
 
     def tratar_dados_receita(self, df_receita_api):
 
@@ -21,7 +26,7 @@ class Transformacao(EtapaEtl):
 
         df_receita_join_2 = self.join_receita_atividade(df_receita_join_1, df_atividade_sec, 'atividades_secundarias')
 
-        df_receita_join_2.show(truncate=False)
+        return df_receita_join_2
 
 
     def join_receita_atividade(self, df_receita: DataFrame, df_atividade: DataFrame,
@@ -50,9 +55,6 @@ class Transformacao(EtapaEtl):
         df_atividade_secundaria = self.criacao_atividade_tratada(df_atividade_secundaria, atividades_secundaria)
 
         df_atividade_secundaria = self.obter_primeira_ocorrencia_atividade(df_atividade_secundaria, atividades_secundaria)
-
-        df_atividade_primaria.show()
-        df_atividade_secundaria.show()
 
         return df_atividade_primaria, df_atividade_secundaria
 
