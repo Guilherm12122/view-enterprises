@@ -2,6 +2,8 @@ import os
 import unittest
 import pytest
 from pyspark.sql import SparkSession
+from pyspark.sql.dataframe import DataFrame
+
 from etl.transformacao.transformacao import Transformacao
 
 # Enxergar variável de ambiente do JAVA
@@ -59,6 +61,70 @@ def test_obter_primeira_ocorrencia_atividade(spark, transformacao_class):
     )
 
     assert resultado.collect() == df_esperado.collect()
+
+
+def test_criacao_atividade_tratada(spark, transformacao_class):
+
+    df_entrada = spark.createDataFrame(
+        [('12345', '1', 'descricao')],
+        ['cnpj_atividade', 'code', 'text']
+    )
+
+    df_esperado = spark.createDataFrame(
+        [('12345', '1 - descricao')], ['cnpj_atividade', 'at1']
+    )
+
+    resultado = transformacao_class.criacao_atividade_tratada(df_entrada, 'at1')
+
+    assert resultado.collect() == df_esperado.collect()
+
+
+def test_explode_df_atividade(spark, transformacao_class):
+
+    df_entrada = spark.createDataFrame(
+        [(
+            '12345',
+            [{
+                'code': '1',
+                'text': 'text1'
+            },
+            {
+                'code': '2',
+                'text': 'text2'
+            }]
+        )], ['cnpj', 'at1']
+    )
+
+    df_esperado = spark.createDataFrame(
+        [('12345',
+          {
+              'code': '1',
+              'text': 'text1'
+          },
+          '1', 'text1'),
+         ('12345',
+          {
+              'code': '2',
+              'text': 'text2'
+          },
+          '2', 'text2')
+         ], ['cnpj_atividade', 'at1', 'code', 'text']
+    )
+
+    resultado = transformacao_class.explode_df_atividade(df_entrada, 'at1')
+
+    assert resultado.collect() == df_esperado.collect()
+
+
+def test_selecionar_colunas_receita(spark, transformacao_class):
+
+    df_entrada = spark.createDataFrame([('', '', '', '', '')],
+                                       ['cnpj', 'nome', 'atividade_principal',
+                                        'atividades_secundarias', 'telefone'])
+
+    resultado = transformacao_class.selecionar_colunas_receita(df_entrada)
+
+    assert isinstance(resultado, DataFrame)
 
 
 def test_filtrar_code_text_nao_vazio(spark, transformacao_class):
