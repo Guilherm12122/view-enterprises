@@ -1,5 +1,5 @@
 from pyspark.sql.dataframe import DataFrame
-from pyspark.sql.functions import col, explode, concat, lit, row_number, regexp_replace, coalesce
+from pyspark.sql.functions import col, explode, concat, lit, row_number, regexp_replace, coalesce, trim
 from pyspark.sql import Window
 
 from devutils.UtilFunctions import UtilFunctions
@@ -115,9 +115,9 @@ class Transformacao(EtapaEtl):
 
         return df_code_text.filter(
             (col("code").isNotNull()) &
-            (col("code") != '') &
+            (trim(col("code")) != '') &
             (col("text").isNotNull()) &
-            (col("text") != '')
+            (trim(col("text")) != '')
         )
 
     def criacao_atividade_tratada(self, df_receita_code_text: DataFrame,
