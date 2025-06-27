@@ -3,6 +3,7 @@ from pyspark.sql.functions import col, explode, concat, lit, row_number, regexp_
 from pyspark.sql import Window
 
 from devutils.UtilFunctions import UtilFunctions
+from etl.const.vars.consts import DATA_ATUAL
 from etl.i_etapa_etl import EtapaEtl
 
 
@@ -19,8 +20,13 @@ class Transformacao(EtapaEtl):
 
         df_dados_receita_brasil_api = self.join_dados_receita_brasil_api(df_dados_receita_tratados, df_brasil_api)
 
+        df_dados_receita_brasil_api = self.adicionar_data_processamento(df_dados_receita_brasil_api)
+
         return df_dados_receita_brasil_api
 
+    def adicionar_data_processamento(self, df_receita_brasil_api: DataFrame):
+
+        return df_receita_brasil_api.withColumn('data_processamento', lit(DATA_ATUAL))
 
     def join_dados_receita_brasil_api(self, df_receita: DataFrame, df_brasil_api: DataFrame) -> DataFrame:
 
