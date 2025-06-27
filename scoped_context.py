@@ -9,4 +9,5 @@ class ScopedContext:
 
         self.url_api_receita: str = os.getenv('URL_API_RECEITA')
         self.url_brasil_api: str = os.getenv('URL_BRASIL_API')
+        self.s3_path_destiny: str = os.getenv('S3_PATH_DESTINY')
 

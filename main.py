@@ -1,4 +1,5 @@
 from etl.extracao.extracao import Extracao
+from etl.persistencia.persistencia import Persistencia
 from etl.transformacao.transformacao import Transformacao
 from scoped_context import ScopedContext
 from pyspark.sql import SparkSession
@@ -18,7 +19,7 @@ class Execucao:
         self.extracao = Extracao(spark_op, self.api_service, self.dynamo_service)
         self.transformacao = Transformacao(spark_op)
 
-        #self.persistencia = Persistencia(spark_op)
+        self.persistencia = Persistencia(spark_op, self.scoped_context.s3_path_destiny)
 
     def executar_processamento(self):
 
@@ -27,13 +28,11 @@ class Execucao:
             self.scoped_context.url_brasil_api
         )
 
-        self.transformacao.executar(df_receita, df_brasil_api)
+        df_dados_empresas = self.transformacao.executar(
+            df_receita, df_brasil_api
+        )
 
-        #df_dados_empresas = self.transformacao.executar(
-        #    df_brasil, df_receita
-        #)
-
-        #self.persistencia.executar(df_dados_empresas)
+        self.persistencia.executar(df_dados_empresas)
 
 if __name__ == "__main__":
 
