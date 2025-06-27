@@ -116,6 +116,59 @@ def test_explode_df_atividade(spark, transformacao_class):
     assert resultado.collect() == df_esperado.collect()
 
 
+def test_join_receita_atividade(spark, transformacao_class):
+
+    df_entrada_1 = spark.createDataFrame(
+        [('12345', 'val1', 'val2')], ['cnpj', 'campo1', 'campo2']
+    )
+
+    df_entrada_2 = spark.createDataFrame(
+        [('12345', 'val4', 'val22'),
+         ('5432', '', '')], ['cnpj_atividade', 'campo4', 'campo2']
+    )
+
+    df_esperado = spark.createDataFrame(
+        [('12345', 'val1', 'val22')],
+        ['cnpj', 'campo1', 'campo2']
+    )
+
+    resultado = transformacao_class.join_receita_atividade(df_entrada_1, df_entrada_2, 'campo2')
+
+    assert resultado.collect() == df_esperado.collect()
+
+
+def test_join_dados_receita_brasil_api(spark, transformacao_class):
+
+    df_entrada_1 = spark.createDataFrame(
+        [('123', '', '', '+551198', 'empresa_ol', ''),
+         ('456', '', '', None, 'empresa_ol', ''),
+         ('789', '', '', None, None, '')],
+        ['cnpj', 'atividade_principal', 'atividades_secundarias',
+         'telefone', 'nome', 'campo_more']
+    )
+
+    df_entrada_2 = spark.createDataFrame(
+        [('123', 'br', '+5567', '+5590', 'empresa_olll', '1212', 'hey', 100, ''),
+         ('456', 'br', '+5567', '+5590', 'empresa_olll', '1212', 'hey', 100, ''),
+         ('789', 'br', None, '+5590', 'empresa_olll', '1212', 'hey', 100, '')],
+        ['cnpj','pais', 'ddd_telefone_1', 'ddd_telefone_2', 'razao_social',
+         'data_inicio_atividade', 'cnae_fiscal_descricao', 'capital_social', 'campo_more']
+    )
+
+    df_esperado = spark.createDataFrame(
+        [('123', 'br', '', '', '+551198', 'empresa_ol', '1212', 'hey', 100),
+         ('789', 'br', '', '', '+5590', 'empresa_olll', '1212', 'hey', 100),
+         ('456', 'br', '', '', '+5567', 'empresa_ol', '1212', 'hey', 100)],
+        ['cnpj', 'pais', 'atividade_principal', 'atividades_secundarias',
+         'telefone', 'nome', 'data_inicio_atividade', 'cnae_fiscal_descricao',
+         'capital_social']
+    )
+
+    resultado = transformacao_class.join_dados_receita_brasil_api(df_entrada_1, df_entrada_2)
+
+    assert resultado.collect() == df_esperado.collect()
+
+
 def test_selecionar_colunas_receita(spark, transformacao_class):
 
     df_entrada = spark.createDataFrame([('', '', '', '', '')],
@@ -140,6 +193,10 @@ def test_filtrar_code_text_nao_vazio(spark, transformacao_class):
             ["code", "text"]
         )
 
+    df_esperado.show(truncate=False)
+
     resultado = transformacao_class.filtrar_code_text_nao_vazio(df_entrada)
+
+    resultado.show(truncate=False)
 
     assert resultado.collect() == df_esperado.collect()
