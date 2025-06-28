@@ -1,10 +1,9 @@
 import os
-import unittest
 import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
 
-from etl.transformacao.transformacao import Transformacao
+from src.etl.transformacao.transformacao import Transformacao
 
 # Enxergar variável de ambiente do JAVA
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"

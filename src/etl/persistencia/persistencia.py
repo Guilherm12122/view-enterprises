@@ -1,6 +1,6 @@
 from pyspark.sql.dataframe import DataFrame
 
-from etl.i_etapa_etl import EtapaEtl
+from src.etl.i_etapa_etl import EtapaEtl
 
 
 class Persistencia(EtapaEtl):

@@ -1,10 +1,8 @@
-from pyspark.sql import DataFrame, Row
+from pyspark.sql import DataFrame
 
-from etl.const.schemas.schema_dados_brasil_api import schema_dados_brasil_api
-from etl.const.schemas.schema_dados_receita import schema_dados_receita
-from etl.i_etapa_etl import EtapaEtl
-from service.cnpj_service import CnpjService
-from service.dynamo_service import DynamoService
+from src.etl.const.schemas.schema_dados_brasil_api import schema_dados_brasil_api
+from src.etl.const.schemas.schema_dados_receita import schema_dados_receita
+from src.etl.i_etapa_etl import EtapaEtl
 
 
 class Extracao(EtapaEtl):
