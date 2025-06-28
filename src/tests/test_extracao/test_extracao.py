@@ -1,13 +1,10 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
-from etl.extracao.extracao import Extracao
-from tests.test_extracao.constantes import DADOS_TESTE, SCHEMA_TESTE
+from src.etl.extracao.extracao import Extracao
+from src.tests.test_extracao.constantes import DADOS_TESTE, SCHEMA_TESTE
 import os
-from service.cnpj_service import CnpjService
-from service.dynamo_service import DynamoService
-
 
 # Enxergar variável de ambiente do JAVA
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"

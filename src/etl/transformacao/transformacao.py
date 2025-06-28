@@ -2,9 +2,8 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import col, explode, concat, lit, row_number, regexp_replace, coalesce, trim
 from pyspark.sql import Window
 
-from devutils.UtilFunctions import UtilFunctions
-from etl.const.vars.consts import DATA_ATUAL
-from etl.i_etapa_etl import EtapaEtl
+from src.etl.const.vars.consts import DATA_ATUAL
+from src.etl.i_etapa_etl import EtapaEtl
 
 
 class Transformacao(EtapaEtl):

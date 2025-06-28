@@ -1,6 +1,6 @@
 import requests
 
-from service.i_api_service_cnpj import ApiServiceCnpj
+from src.service.i_api_service_cnpj import ApiServiceCnpj
 
 
 class CnpjService(ApiServiceCnpj):
