@@ -42,6 +42,8 @@ if __name__ == "__main__":
         .config("spark.some.config.option", "some-value") \
         .getOrCreate()
 
+    spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
+
     execucao = Execucao(spark)
     execucao.executar_processamento()
 
