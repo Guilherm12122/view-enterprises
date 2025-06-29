@@ -6,6 +6,8 @@ class DynamoService:
         pass
 
 
+    # Exceções:
+    # - SE não existir dados para o dia especificado, lança exceção e para a aplicação.
     def obter_cnpjs_para_processamento(self):
 
         '''
@@ -15,4 +17,4 @@ class DynamoService:
         :return:
         '''
         # TESTE
-        return ['19131243000197', '33372251006278']
+        return ['1913124300019007', '33372251006270008']
