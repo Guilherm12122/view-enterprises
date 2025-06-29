@@ -1,13 +1,16 @@
-from dotenv import load_dotenv
-import os
+import sys
+from awsglue.utils import getResolvedOptions
 
 class ScopedContext:
 
     def __init__(self):
 
-        load_dotenv()
+        args = getResolvedOptions(sys.argv, ['URL_API_RECEITA', 'URL_BRASIL_API', 'S3_PATH_DESTINY',
+                                                    'TABELA_DYNAMO_NAME'])
 
-        self.url_api_receita: str = os.getenv('URL_API_RECEITA')
-        self.url_brasil_api: str = os.getenv('URL_BRASIL_API')
-        self.s3_path_destiny: str = os.getenv('S3_PATH_DESTINY')
+        # Obtêndo parâmetros do Glue
+        self.url_api_receita: str = args['URL_API_RECEITA']
+        self.url_brasil_api: str = args['URL_BRASIL_API']
+        self.s3_path_destiny: str = args['S3_PATH_DESTINY']
+        self.tabela_dynamo_name: str = args['TABELA_DYNAMO_NAME']
 

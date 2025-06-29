@@ -1,0 +1,3 @@
+{
+    'cpnj': str -> lista_cnpjs: str 
+}
