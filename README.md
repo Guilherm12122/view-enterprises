@@ -31,6 +31,7 @@ O projeto foi desenvolvido com o objetivo de oferecer um fluxo automatizado de c
 | **DynamoDB**   | Armazenamento da lista de CNPJs por data de execução      |
 | **Amazon S3**  | Armazenamento de dados processados (formato Parquet)      |
 | **QuickSight** | Visualização de dados e geração de dashboards analíticos  |
+| **MongoDB**    | Simular banco de dados chave-valor de forma local         |
 
 ---
 
@@ -89,6 +90,8 @@ view-enterprises/
 2. Ajuste a DAG no Airflow (`dag_view_enterprise.py`) com os parâmetros do ambiente.
 3. Rode o Airflow e agende a DAG para execução diária.
 4. Os dados processados ficarão salvos no S3, disponíveis para análise via QuickSight.
+
+*Na branch version/local, existe uma versão para ser executada localmente, usando o MongoDB.*
 
 ---
 
