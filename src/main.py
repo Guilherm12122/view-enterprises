@@ -12,9 +12,14 @@ class Execucao:
 
     def __init__(self, spark_op):
 
-        self.api_service = CnpjService()
-        self.dynamo_service = DynamoService()
         self.scoped_context = ScopedContext()
+        self.api_service = CnpjService()
+
+        self.dynamo_service = DynamoService(
+            self.scoped_context.url_mongo,
+            self.scoped_context.mongo_database
+        )
+
 
         self.extracao = Extracao(spark_op, self.api_service, self.dynamo_service)
         self.transformacao = Transformacao(spark_op)
@@ -41,6 +46,8 @@ if __name__ == "__main__":
         .appName("Job for View Enterprise") \
         .config("spark.some.config.option", "some-value") \
         .getOrCreate()
+
+    spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
 
     execucao = Execucao(spark)
     execucao.executar_processamento()

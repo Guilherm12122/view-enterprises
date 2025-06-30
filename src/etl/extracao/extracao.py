@@ -2,6 +2,7 @@ from pyspark.sql import DataFrame
 
 from src.etl.const.schemas.schema_dados_brasil_api import schema_dados_brasil_api
 from src.etl.const.schemas.schema_dados_receita import schema_dados_receita
+from src.etl.const.vars.consts import DATA_ATUAL
 from src.etl.i_etapa_etl import EtapaEtl
 
 
@@ -15,8 +16,10 @@ class Extracao(EtapaEtl):
     def executar(self, url_api_receita: str, url_brasil_api: str):
 
         # CNPJ DE TESTE:
-        # BRASI_API: 19131243000197, 33372251006278
-        # RECEITA_API: 19131243000197, 33372251006278
+
+        #60701190000104 -> ITAU
+        #73042962000187 -> DISNEY
+        #06152891000188 -> WARNER
 
         dados_api_receita, dados_brasil_api = self.obter_dicts_api_receita_brasil(url_api_receita, url_brasil_api)
         df_api_receita: DataFrame = self.obter_dataframe_dados_api(dados_api_receita, schema_dados_receita)
@@ -36,11 +39,23 @@ class Extracao(EtapaEtl):
 
         return  dados_api_receita, dados_brasil_api
 
-
-
     def obter_lista_dicts_cnpj(self, url, lista_cnpj):
 
-        return [self.api_service.obter_dados_cnpj(url, cpnj) for cpnj in lista_cnpj]
+        lista_dicts_cnpj = []
+
+        for cpnj in lista_cnpj:
+
+            response_api = self.api_service.obter_dados_cnpj(url, cpnj)
+
+            if response_api.status_code != 200:
+                continue
+            else:
+                lista_dicts_cnpj.append(response_api.json())
+
+        if len(lista_dicts_cnpj) == 0:
+            raise Exception(f"Não existem CNPJS válidos para o processamento do dia {DATA_ATUAL}")
+
+        return lista_dicts_cnpj
 
 
     def obter_dataframe_dados_api(self, dados, schema):
